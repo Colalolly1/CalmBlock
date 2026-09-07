@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CalmBlock</string>
+    <string name="service_label">CalmBlock</string>
+    <string name="service_description">Shows the blocked screen when a blocked app or website is opened. Turning this off suspends the browser until it is turned back on.</string>
+</resources>
