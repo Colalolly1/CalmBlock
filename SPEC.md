@@ -68,6 +68,12 @@ One button: Back. It goes to the home screen. No unlock path from this screen.
 Quotes come from a built-in list of short attributed lines, around forty,
 rotated so the same one does not repeat twice in a row.
 
+Sound is stopped too. A blocked music or podcast app plays from the
+background, where the accessibility service never sees it, so the app takes
+hold of its media session and pauses it, and clears its notifications so no
+play button is left in the shade. This needs notification access, granted once
+from the app's Settings tab.
+
 How it gets there: the app's accessibility service sees every app that comes
 to the front. When it is one in an active block, the blocked screen is put over
 it straight away and Back goes home. Reopen the app and the same happens

@@ -12,6 +12,7 @@ import com.calmblock.app.data.AppDb
 import com.calmblock.app.data.BlockEntity
 import com.calmblock.app.data.ItemEntity
 import com.calmblock.app.data.Prefs
+import com.calmblock.app.media.MediaGuard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -72,6 +73,7 @@ object Reconciler {
         Registry.adminActive = policy.isAdminActive
         Registry.launchers = policy.launcherPackages()
         WatchService.enforceNow()
+        MediaGuard.enforceNow()
 
         runCatching { UsageTracker(context, policy).rollup(dao, now) }
             .onFailure { Log.w("CalmBlock", "usage rollup failed", it) }

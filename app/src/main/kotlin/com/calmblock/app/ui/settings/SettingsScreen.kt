@@ -46,6 +46,7 @@ fun SettingsScreen(repo: Repo) {
     val adminActive = remember(tick) { repo.policy.isAdminActive }
     val accessibilityOn = remember(tick) { Access.accessibilityOn(context) }
     val usageOn = remember(tick) { Access.usageAccessOn(context) }
+    val notificationsOn = remember(tick) { Access.notificationAccessOn(context) }
     val browsers = remember(tick) {
         val protected = repo.policy.protectedPackages()
         (repo.policy.webCapablePackages() - protected).associateWith { repo.policy.label(it) }.toList().sortedBy { it.second }
@@ -62,6 +63,8 @@ fun SettingsScreen(repo: Repo) {
                     ListRow("Uninstall protection", meta = "Device admin", trailing = if (adminActive) "On" else "Off")
                     Hairline()
                     ListRow("Blocking service", meta = "Accessibility", trailing = if (accessibilityOn) "On" else "Off")
+                    Hairline()
+                    ListRow("Sound and notifications", meta = "Notification access", trailing = if (notificationsOn) "On" else "Off")
                     Hairline()
                     ListRow("Usage access", trailing = if (usageOn) "On" else "Off")
                     Hairline()
@@ -84,6 +87,13 @@ fun SettingsScreen(repo: Repo) {
                 Note("Without this nothing is blocked. Find CalmBlock in the list and turn it on.")
                 OutlineButton("Turn on blocking", Modifier.fillMaxWidth().padding(horizontal = Dim.screenPad)) {
                     open(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                }
+                Spacer(Modifier.height(10.dp))
+            }
+            if (!notificationsOn) {
+                Note("Without this, a blocked music or podcast app keeps playing in the background.")
+                OutlineButton("Turn on sound blocking", Modifier.fillMaxWidth().padding(horizontal = Dim.screenPad)) {
+                    open(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
                 }
                 Spacer(Modifier.height(10.dp))
             }
