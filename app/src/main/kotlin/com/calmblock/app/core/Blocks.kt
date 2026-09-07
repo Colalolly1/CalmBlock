@@ -74,9 +74,11 @@ object Rules {
 
     fun isEditable(status: Status): Boolean = status == Status.Inactive
 
-    /** Additions are allowed to a permanent block even once confirmed. Removals never are. */
-    fun canAdd(block: Block, status: Status): Boolean =
-        status == Status.Inactive || block.builtIn || block.mode == Mode.PERMANENT
+    /**
+     * Always. Adding an app or site takes access away, and anything that takes
+     * access away is instant. Only removal is gated, by [canRemove].
+     */
+    fun canAdd(): Boolean = true
 
     fun canRemove(status: Status): Boolean = status == Status.Inactive
 

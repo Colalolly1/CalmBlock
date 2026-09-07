@@ -79,13 +79,13 @@ class RulesTest {
 
     @Test fun permissionsFollowStatus() {
         val confirmed = block(Mode.PERMANENT, confirmedAt = 1L)
-        assertTrue(Rules.canAdd(confirmed, Status.Active(null)))
         assertFalse(Rules.canRemove(Status.Active(null)))
         assertFalse(Rules.canDelete(confirmed, Status.Active(null)))
         val draft = block(Mode.TIMED)
         assertTrue(Rules.canDelete(draft, Status.Inactive))
-        assertFalse(Rules.canAdd(draft, Status.Active(5L)))
         assertFalse(Rules.canRemove(Status.Frozen(5L)))
+        // Adding takes access away, so it is never blocked.
+        assertTrue(Rules.canAdd())
     }
 
     @Test fun domainsNormaliseAndMatch() {

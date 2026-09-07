@@ -24,14 +24,18 @@ A block has a name, a list of apps, a list of website domains, and one mode.
 
 | Mode | How it starts | When it ends | Can you edit it while active |
 |---|---|---|---|
-| Permanent | Tap Block permanently, confirm once | Never | No. Nothing can be changed, removed, or skipped. |
-| Timed | Pick a duration, tap Start | When the duration runs out | No. Not until the timer ends. |
-| Scheduled | Set days and a start and end time | End time each day | No, and not during the freeze window before it either. |
+| Permanent | Tap Block permanently, confirm once | Never | Nothing can be taken out, ever. More can always be added. |
+| Timed | Pick a duration, confirm | When the duration runs out | Nothing taken out until it ends. More can be added. |
+| Scheduled | Set days and times, turn it on | End time each day | Nothing taken out while active or frozen. More can be added. |
 
-**Permanent** is the main mode. Once confirmed, the block and everything in it
-is frozen forever. No edit, no delete, no pause, no emergency unlock, no PIN,
-no waiting period that eventually opens it. Adding an app or website to a
-permanent block is allowed. Removing one is not.
+**Permanent** is the main mode. Once confirmed, nothing in the block can be
+taken out. No edit, no delete, no pause, no emergency unlock, no waiting period
+that eventually opens it.
+
+**Adding is always allowed.** Apps and websites can be added to any block at
+any moment, active, frozen or not, because adding only ever takes access away.
+Removing is what gets guarded. This is the same asymmetry the whole app runs
+on: tightening is instant, loosening is not.
 
 **Timed** starts a countdown for a duration you choose when you start it. While
 it runs the block is frozen exactly like a permanent block. When it ends the

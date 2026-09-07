@@ -57,7 +57,7 @@ fun BlockScreen(repo: Repo, id: Long, onBack: () -> Unit, onPickApps: () -> Unit
     val now = repo.now()
     val status = Rules.status(b, now)
     val editable = Rules.isEditable(status) && !b.builtIn
-    val canAdd = Rules.canAdd(b, status)
+    val canAdd = Rules.canAdd()
     val canRemove = Rules.canRemove(status)
 
     var name by remember(b.id) { mutableStateOf(b.name) }
@@ -316,14 +316,14 @@ fun scheduleSummary(b: Block): String {
 }
 
 private fun reason(b: Block, status: Status, now: Long): String {
-    if (b.builtIn) return "Always on. Anything added here is blocked from then on, around the clock, and can never be removed."
+    if (b.builtIn) return "Always on. Anything added here is blocked from then on, around the clock, and can never be taken out."
     return when (status) {
         is Status.Active -> when {
-            status.until == null -> "Permanent. Cannot be changed. Apps and websites can still be added."
-            b.mode == Mode.TIMED -> "Running. Ends in ${Format.remaining(status.until, now)}. Cannot be changed."
-            else -> "Active until ${Format.moment(status.until, now)}. Cannot be changed."
+            status.until == null -> "Permanent. Nothing can be taken out. Apps and websites can still be added."
+            b.mode == Mode.TIMED -> "Running. Ends in ${Format.remaining(status.until, now)}. Nothing can be taken out, but more can be added."
+            else -> "Active until ${Format.moment(status.until, now)}. Nothing can be taken out, but more can be added."
         }
-        is Status.Frozen -> "Frozen until ${Format.moment(status.until, now)}. Cannot be changed."
+        is Status.Frozen -> "Frozen until ${Format.moment(status.until, now)}. Nothing can be taken out, but more can be added."
         Status.Inactive -> when {
             b.mode == Mode.PERMANENT -> "Not yet confirmed. Everything can be changed until it is."
             b.mode == Mode.SCHEDULED && !b.enabled -> "Schedule is off. Everything can be changed."

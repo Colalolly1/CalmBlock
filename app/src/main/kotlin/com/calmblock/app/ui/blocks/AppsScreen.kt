@@ -31,8 +31,7 @@ fun AppsScreen(repo: Repo, id: Long, onDone: () -> Unit) {
         repo.policy.launchableApps().filterKeys { it !in protected }.toList().sortedBy { it.second.lowercase() }
     }
     val b = block ?: return
-    val status = Rules.status(b, repo.now())
-    val canRemove = Rules.canRemove(status)
+    val canRemove = Rules.canRemove(Rules.status(b, repo.now()))
     val added = items.filter { it.kind == ItemEntity.APP }.map { it.value }.toSet()
 
     Column(Modifier.fillMaxSize()) {

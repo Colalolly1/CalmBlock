@@ -86,14 +86,19 @@ class Repo(private val context: Context) {
         Reconciler.run(context)
     }
 
-    suspend fun addApp(blockId: Long, pkg: String, label: String) = addable(blockId) {
+    /** Allowed whatever the block is doing: adding only ever blocks more. */
+    suspend fun addApp(blockId: Long, pkg: String, label: String) {
+        dao.blockNow(blockId) ?: return
         dao.insertItem(ItemEntity(blockId, ItemEntity.APP, pkg, label, now()))
+        Reconciler.run(context)
     }
 
     /** Returns false when the text holds no usable domain. */
     suspend fun addDomain(blockId: Long, text: String): Boolean {
         val domain = Domains.normalise(text) ?: return false
-        addable(blockId) { dao.insertItem(ItemEntity(blockId, ItemEntity.DOMAIN, domain, domain, now())) }
+        dao.blockNow(blockId) ?: return false
+        dao.insertItem(ItemEntity(blockId, ItemEntity.DOMAIN, domain, domain, now()))
+        Reconciler.run(context)
         return true
     }
 
@@ -115,11 +120,4 @@ class Repo(private val context: Context) {
         Reconciler.run(context)
     }
 
-    private suspend fun addable(id: Long, change: suspend (BlockEntity) -> Unit) {
-        val e = dao.blockNow(id) ?: return
-        val b = e.toBlock()
-        if (!Rules.canAdd(b, Rules.status(b, now()))) return
-        change(e)
-        Reconciler.run(context)
-    }
 }
