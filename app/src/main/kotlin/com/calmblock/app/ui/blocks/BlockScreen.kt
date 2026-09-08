@@ -65,6 +65,18 @@ fun BlockScreen(repo: Repo, id: Long, onBack: () -> Unit, onPickApps: () -> Unit
     var domainError by remember { mutableStateOf(false) }
     var confirming by remember { mutableStateOf<String?>(null) }
     var chosenMinutes by remember { mutableStateOf(120) }
+    var pendingDomain by remember { mutableStateOf<String?>(null) }
+
+    pendingDomain?.let { domain ->
+        ConfirmAdd(
+            what = domain,
+            forever = Rules.isForever(b),
+            untilText = (status as? Status.Active)?.until?.let { "in ${Format.remaining(it, now)}" },
+            onConfirm = { scope.launch { repo.addDomain(id, domain); domainText = ""; pendingDomain = null } },
+            onCancel = { pendingDomain = null },
+        )
+        return
+    }
 
     Column(Modifier.fillMaxSize()) {
         TopBar(b.name, onBack = onBack)
@@ -193,9 +205,14 @@ fun BlockScreen(repo: Repo, id: Long, onBack: () -> Unit, onPickApps: () -> Unit
                     )
                     Spacer(Modifier.width(10.dp))
                     PrimaryButton("Block") {
-                        scope.launch {
-                            val ok = repo.addDomain(id, domainText)
-                            if (ok) domainText = "" else domainError = true
+                        val cleaned = com.calmblock.app.core.Domains.normalise(domainText)
+                        when {
+                            cleaned == null -> domainError = true
+                            !canRemove -> pendingDomain = cleaned
+                            else -> scope.launch {
+                                repo.addDomain(id, cleaned)
+                                domainText = ""
+                            }
                         }
                     }
                 }
@@ -316,10 +333,10 @@ fun scheduleSummary(b: Block): String {
 }
 
 private fun reason(b: Block, status: Status, now: Long): String {
-    if (b.builtIn) return "Always on. Anything added here is blocked from then on, around the clock, and can never be taken out."
+    if (b.builtIn) return "Always on, around the clock. Anything added here can never be taken out, so each addition asks you to confirm."
     return when (status) {
         is Status.Active -> when {
-            status.until == null -> "Permanent. Nothing can be taken out. Apps and websites can still be added."
+            status.until == null -> "Permanent. Nothing can be taken out. Additions are allowed and each one asks you to confirm."
             b.mode == Mode.TIMED -> "Running. Ends in ${Format.remaining(status.until, now)}. Nothing can be taken out, but more can be added."
             else -> "Active until ${Format.moment(status.until, now)}. Nothing can be taken out, but more can be added."
         }

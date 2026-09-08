@@ -37,6 +37,14 @@ any moment, active, frozen or not, because adding only ever takes access away.
 Removing is what gets guarded. This is the same asymmetry the whole app runs
 on: tightening is instant, loosening is not.
 
+**But an addition that cannot be taken back has to be confirmed.** Adding to
+any block that will not let the item out again takes over the whole screen
+first, naming the app or website and saying plainly what is about to happen.
+Cancel is the prominent button. If the block is permanent, the word BLOCK has
+to be typed before the confirm button will work at all, so no mis-tap and no
+half-awake thumb can reach it. Adding to a block that is merely running gets
+the same screen without the typing, since that one ends by itself.
+
 **Timed** starts a countdown for a duration you choose when you start it. While
 it runs the block is frozen exactly like a permanent block. When it ends the
 block is inactive and editable again. A running timer cannot be shortened or

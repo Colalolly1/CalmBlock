@@ -82,6 +82,10 @@ object Rules {
 
     fun canRemove(status: Status): Boolean = status == Status.Inactive
 
+    /** True when what goes in can never come out again, whatever the user does later. */
+    fun isForever(block: Block): Boolean =
+        block.builtIn || (block.mode == Mode.PERMANENT && block.confirmedAt != null)
+
     fun canDelete(block: Block, status: Status): Boolean =
         !block.builtIn && block.confirmedAt == null && status == Status.Inactive
 
