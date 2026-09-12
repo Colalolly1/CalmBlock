@@ -34,6 +34,10 @@ class PolicyEngine(private val context: Context) {
 
     fun launcherPackages(): Set<String> = resolveAll(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME))
 
+    /** Settings answers the home query too, via its boot-time fallback activity. */
+    fun settingsPackages(): Set<String> =
+        setOf("com.android.settings", "com.android.packageinstaller", "com.google.android.packageinstaller")
+
     /** Anything that will open a plain http link. */
     fun webCapablePackages(): Set<String> =
         resolveAll(Intent(Intent.ACTION_VIEW, Uri.parse("http://example.com")).addCategory(Intent.CATEGORY_BROWSABLE))

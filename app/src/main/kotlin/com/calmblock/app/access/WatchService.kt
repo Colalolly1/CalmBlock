@@ -48,7 +48,8 @@ class WatchService : AccessibilityService() {
                 if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) show(BlockedActivity.KIND_APP, Registry.labels[pkg] ?: pkg)
             }
             pkg == Registry.browser -> checkBrowser(event)
-            pkg in GUARDED || pkg in Registry.launchers -> guardSettings(event)
+            pkg in GUARDED -> guardSettings(event)
+            pkg in Registry.launchers -> guardLauncher(event)
         }
     }
 
@@ -98,10 +99,6 @@ class WatchService : AccessibilityService() {
      */
     private fun guardSettings(event: AccessibilityEvent) {
         val pkg = event.packageName?.toString() ?: return
-        if (pkg in Registry.launchers) {
-            guardLauncher(event)
-            return
-        }
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) return
 
         // While a permission is still missing, Settings has to stay reachable so it

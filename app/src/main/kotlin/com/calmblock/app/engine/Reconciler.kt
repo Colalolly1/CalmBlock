@@ -75,7 +75,7 @@ object Reconciler {
             Access.accessibilityOn(context) &&
             Access.notificationAccessOn(context) &&
             Access.usageAccessOn(context)
-        Registry.launchers = policy.launcherPackages()
+        Registry.launchers = policy.launcherPackages() - policy.settingsPackages()
         WatchService.enforceNow()
         MediaGuard.enforceNow()
 
