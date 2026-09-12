@@ -71,6 +71,10 @@ object Reconciler {
         Registry.domains = domains
         Registry.browser = browser
         Registry.adminActive = policy.isAdminActive
+        Registry.setupComplete = policy.isAdminActive &&
+            Access.accessibilityOn(context) &&
+            Access.notificationAccessOn(context) &&
+            Access.usageAccessOn(context)
         Registry.launchers = policy.launcherPackages()
         WatchService.enforceNow()
         MediaGuard.enforceNow()

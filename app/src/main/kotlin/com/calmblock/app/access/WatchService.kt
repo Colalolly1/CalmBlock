@@ -103,20 +103,23 @@ class WatchService : AccessibilityService() {
             return
         }
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) return
+
+        // While a permission is still missing, Settings has to stay reachable so it
+        // can be granted. Every page named below is one that could switch this app
+        // off, so once everything is granted none of them may be opened at all.
+        if (!Registry.setupComplete) return
+
+        val cls = event.className?.toString() ?: ""
+        // The accessibility pages go first: their text has often not rendered by the
+        // time the window opens, so waiting to read it loses the race to the switch.
+        if (ACCESSIBILITY_SCREENS.any { cls.contains(it, ignoreCase = true) }) {
+            goHome()
+            return
+        }
         val text = StringBuilder()
         event.text.forEach { text.append(it).append(' ') }
         rootInActiveWindow?.let { collectText(it, text, 0) }
-        if (!text.contains(APP_NAME, ignoreCase = true)) return
-        val cls = event.className?.toString() ?: ""
-        val dangerous = when {
-            pkg != "com.android.settings" -> true
-            cls.contains("InstalledAppDetails") || cls.contains("AppInfo") -> true
-            APP_INFO_WORDS.any { text.contains(it, ignoreCase = true) } -> true
-            Registry.adminActive && text.contains("Deactivate", ignoreCase = true) -> true
-            text.contains(SERVICE_PAGE_MARKER, ignoreCase = true) -> true
-            else -> false
-        }
-        if (dangerous) goHome()
+        if (text.contains(APP_NAME, ignoreCase = true)) goHome()
     }
 
     /**
@@ -150,9 +153,11 @@ class WatchService : AccessibilityService() {
 
     private fun goHome() {
         val now = System.currentTimeMillis()
-        if (now - lastShown < 800L) return
+        if (now - lastShown < 400L) return
         lastShown = now
-        performGlobalAction(GLOBAL_ACTION_HOME)
+        listOf(0L, 150L, 400L).forEach { delay ->
+            main.postDelayed({ performGlobalAction(GLOBAL_ACTION_HOME) }, delay)
+        }
     }
 
     private fun show(kind: String, label: String) {
@@ -171,8 +176,12 @@ class WatchService : AccessibilityService() {
 
     companion object {
         private const val APP_NAME = "CalmBlock"
-        private const val SERVICE_PAGE_MARKER = "Shows the blocked screen"
-        private val APP_INFO_WORDS = listOf("Uninstall", "Force stop", "Clear storage", "Clear data", "Clear cache")
+        private val ACCESSIBILITY_SCREENS = listOf(
+            "AccessibilitySettings",
+            "ToggleAccessibilityServicePreferenceFragment",
+            "AccessibilityDetailsSettings",
+            "AccessibilityShortcut",
+        )
         private val GUARDED = setOf("com.android.settings", "com.android.packageinstaller", "com.google.android.packageinstaller")
         private val ADDRESS_BAR_IDS = listOf(
             "com.duckduckgo.mobile.android:id/omnibarTextInput",

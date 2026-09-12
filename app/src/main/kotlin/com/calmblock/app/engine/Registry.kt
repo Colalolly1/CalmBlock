@@ -10,5 +10,8 @@ object Registry {
     @Volatile var domains: Set<String> = emptySet()
     @Volatile var browser: String? = null
     @Volatile var adminActive: Boolean = false
+
+    /** All permissions granted. Until then Settings must stay reachable to grant them. */
+    @Volatile var setupComplete: Boolean = false
     @Volatile var launchers: Set<String> = emptySet()
 }

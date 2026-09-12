@@ -154,8 +154,16 @@ contrast, no gradients, no shadows. Large type.
 - A permanent block is stored with a flag that the app refuses to clear. There
   is no code path that deletes a permanent block.
 
-**The one gap.** Booting the phone into safe mode turns off all accessibility
-services, and from there the app could be removed. Closing that would need the
+**Settings is closed once setup is done.** While any permission is still
+missing, Settings stays reachable so it can be granted. The moment all four are
+granted, any Settings page that so much as names this app sends the phone home,
+the accessibility pages soonest of all, before their text has even drawn.
+
+**The one gap.** Android guarantees that a user can always switch off an
+accessibility service; a service is not allowed to prevent its own disabling.
+Safe mode turns them all off outright, and the volume-key accessibility
+shortcut can toggle one without going near Settings. Guarding the pages makes
+the switch hard to reach, not impossible. Closing that would need the
 Device Owner role, which Android will not grant on a phone that already has
 accounts on it. Nothing else on the phone is affected by any of this: no
 accounts, no data, no reset, no VPN.
