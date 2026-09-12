@@ -162,14 +162,8 @@ and usage access switches, the device admin page, the uninstall dialog. Pages
 that merely list it among other apps are left alone, so the rest of Settings
 stays usable.
 
-**The one gap.** Android guarantees that a user can always switch off an
-accessibility service; a service is not allowed to prevent its own disabling.
-Safe mode turns them all off outright, and the volume-key accessibility
-shortcut can toggle one without going near Settings. Guarding the pages makes
-the switch hard to reach, not impossible. Closing that would need the
-Device Owner role, which Android will not grant on a phone that already has
-accounts on it. Nothing else on the phone is affected by any of this: no
-accounts, no data, no reset, no VPN.
+**Where this stops.** Guarding the pages is as far as this phone allows. The
+HiBreak Pro build goes further, which is the reason it exists.
 
 ## Setup, on the phone
 
