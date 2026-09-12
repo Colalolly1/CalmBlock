@@ -97,26 +97,43 @@ class WatchService : AccessibilityService() {
      * active, this service's own toggle page, and the package installer's
      * uninstall dialog. The pages needed to set the app up are left alone.
      */
+    /**
+     * Settings pages that are about this app are off limits once every
+     * permission is granted: app info, its accessibility switch, its
+     * notification and usage access switches, the device admin page. Pages
+     * that merely list it among other apps are left alone, so the rest of
+     * Settings stays usable. While a permission is still missing, nothing is
+     * guarded, so it can be granted.
+     */
     private fun guardSettings(event: AccessibilityEvent) {
-        val pkg = event.packageName?.toString() ?: return
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) return
-
-        // While a permission is still missing, Settings has to stay reachable so it
-        // can be granted. Every page named below is one that could switch this app
-        // off, so once everything is granted none of them may be opened at all.
         if (!Registry.setupComplete) return
-
+        val pkg = event.packageName?.toString() ?: return
         val cls = event.className?.toString() ?: ""
-        // The accessibility pages go first: their text has often not rendered by the
-        // time the window opens, so waiting to read it loses the race to the switch.
-        if (ACCESSIBILITY_SCREENS.any { cls.contains(it, ignoreCase = true) }) {
-            goHome()
-            return
-        }
+        val root = rootInActiveWindow
         val text = StringBuilder()
         event.text.forEach { text.append(it).append(' ') }
-        rootInActiveWindow?.let { collectText(it, text, 0) }
-        if (text.contains(APP_NAME, ignoreCase = true)) goHome()
+        root?.let { collectText(it, text, 0) }
+        val dangerous = if (pkg == "com.android.settings") aboutThisApp(root, cls, text) else text.contains(APP_NAME, ignoreCase = true)
+        if (dangerous) goHome()
+    }
+
+    /** True when the page's subject is this app, as opposed to a list that happens to include it. */
+    private fun aboutThisApp(root: AccessibilityNodeInfo?, cls: String, text: CharSequence): Boolean {
+        if (root != null) {
+            for (id in HEADING_IDS) {
+                val heading = root.findAccessibilityNodeInfosByViewId(id).firstOrNull()?.text?.toString()?.trim() ?: continue
+                if (heading.equals(APP_NAME, ignoreCase = true)) return true
+            }
+        }
+        if (!text.contains(APP_NAME, ignoreCase = true)) return false
+        return when {
+            PER_APP_SCREENS.any { cls.contains(it, ignoreCase = true) } -> true
+            text.contains("Use $APP_NAME", ignoreCase = true) -> true
+            APP_INFO_WORDS.any { text.contains(it, ignoreCase = true) } -> true
+            Registry.adminActive && text.contains("Deactivate", ignoreCase = true) -> true
+            else -> false
+        }
     }
 
     /**
@@ -173,12 +190,23 @@ class WatchService : AccessibilityService() {
 
     companion object {
         private const val APP_NAME = "CalmBlock"
-        private val ACCESSIBILITY_SCREENS = listOf(
-            "AccessibilitySettings",
+        /** The page heading on this ROM's Settings: the toolbar title, and the per-app header. */
+        private val HEADING_IDS = listOf(
+            "com.android.settings:id/entity_header_title",
+            "com.android.settings:id/toolbar_title",
+        )
+
+        /** Screens that are always about one app. Lists of apps are deliberately absent. */
+        private val PER_APP_SCREENS = listOf(
+            "InstalledAppDetails",
+            "AppInfoDashboard",
+            "NotificationAccessDetails",
+            "UsageAccessDetails",
             "ToggleAccessibilityServicePreferenceFragment",
             "AccessibilityDetailsSettings",
-            "AccessibilityShortcut",
+            "DeviceAdminAdd",
         )
+        private val APP_INFO_WORDS = listOf("Uninstall", "Force stop", "Clear storage", "Clear data", "Clear cache")
         private val GUARDED = setOf("com.android.settings", "com.android.packageinstaller", "com.google.android.packageinstaller")
         private val ADDRESS_BAR_IDS = listOf(
             "com.duckduckgo.mobile.android:id/omnibarTextInput",

@@ -154,10 +154,13 @@ contrast, no gradients, no shadows. Large type.
 - A permanent block is stored with a flag that the app refuses to clear. There
   is no code path that deletes a permanent block.
 
-**Settings is closed once setup is done.** While any permission is still
-missing, Settings stays reachable so it can be granted. The moment all four are
-granted, any Settings page that so much as names this app sends the phone home,
-the accessibility pages soonest of all, before their text has even drawn.
+**Settings pages about this app are closed once setup is done.** While any
+permission is still missing, Settings stays reachable so it can be granted. The
+moment all four are granted, any Settings page whose subject is this app sends
+the phone home: its app info page, its accessibility switch, its notification
+and usage access switches, the device admin page, the uninstall dialog. Pages
+that merely list it among other apps are left alone, so the rest of Settings
+stays usable.
 
 **The one gap.** Android guarantees that a user can always switch off an
 accessibility service; a service is not allowed to prevent its own disabling.
